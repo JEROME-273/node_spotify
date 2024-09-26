@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Song</title>
+</head>
+<body>
+    <h1>Edit Song</h1>
+    <% if (song) { %>
+        <form action="/save-edit/<%= song.id %>" method="POST" enctype="multipart/form-data">
+            <input type="text" name="title" value="<%= song.title %>" required>
+            <input type="text" name="artist" value="<%= song.artist %>" required>
+            <input type="file" name="pictures" accept="image/*">
+            <input type="file" name="music" accept="audio/*">
+            <textarea name="lyrics"><%= song.lyrics %></textarea>
+            <button type="submit">Save Changes</button>
+        </form>
+    <% } else { %>
+        <p>Song not found!</p>
+    <% } %>
+</body>
+
+</html>

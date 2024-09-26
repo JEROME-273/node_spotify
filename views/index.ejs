@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Upload Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .upload-section, .player-section, .image-playlist-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-section h2 {
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .upload-section label {
+            margin-top: 10px;
+            color: #fff;
+        }
+
+        .upload-section input, .upload-section textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .upload-section button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .player-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .lyrics-box {
+            flex: 1;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            color: #000;
+        }
+
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .playback-controls {
+            margin-top: 10px;
+        }
+
+        button.prev-btn, button.play-btn, button.next-btn {
+            background: none;
+            border: none;
+            font-size: 2em;
+            color: #000;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+
+        .seekbar {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .image-playlist-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .image-box {
+            height: auto; /* Allow the height to adjust automatically */
+            overflow: hidden; /* Hide any overflow */
+        }
+
+        .image-box img {
+            width: 100%; /* Make the image responsive to the container width */
+            height: auto; /* Maintain aspect ratio */
+            object-fit: cover; /* Cover the container without distortion */
+        }
+
+        .playlist-box {
+            flex: 1;
+        }
+        .all-data-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px; /* Space above the section */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .all-data-section h2 {
+            color: #fff; /* Heading color */
+            margin-bottom: 10px;
+        }
+
+        .all-data-container {
+            overflow-y: auto; /* Allow scrolling if needed */
+            max-height: 300px; /* Set a fixed height for the list */
+        }
+
+        .all-data-container ul {
+            list-style: none; /* Remove default list styling */
+            padding: 0; /* Remove default padding */
+        }
+
+        .all-data-container li {
+            margin-bottom: 15px; /* Space between items */
+            color: #fff; /* Text color */
+        }
+
+        .all-data-container img {
+            width: 50px; /* Set a fixed width for the image */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 5px; /* Rounded corners for images */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="upload-section">
+            <form action="/save" method="post" enctype="multipart/form-data">
+                <label for="title">Title</label>
+                <input type="text" name="title" id="title" placeholder="Enter title">
+                
+                <label for="artist">Artist</label>
+                <input type="text" name="artist" id="artist" placeholder="Enter artist name">
+                
+                <label for="pictures">Pictures</label>
+                <input type="file" name="pictures" id="pictures" accept="image/*">
+                
+                <label for="music">Music File</label>
+                <input type="file" name="music" id="music" accept="audio/*">
+                
+                <label for="lyrics">Lyrics</label>
+                <textarea name="lyrics" id="lyrics" rows="4" placeholder="Enter lyrics..."></textarea>
+                
+                <button type="submit">Upload</button>
+            </form>
+        </div>
+
+        <div class="player-section">
+            <h2>Now Playing</h2>
+            <div class="lyrics-box">
+                <p><%= currentSong ? currentSong.lyrics : 'No song playing' %></p>
+            </div>
+            <div class="controls">
+                <h2><%= currentSong ? currentSong.title : 'No song playing' %></h2>
+            </div>
+        </div>
+
+        <div class="image-playlist-section">
+            <div class="image-box">
+                <img src="/uploads/pictures/<%= currentSong ? currentSong.pictures : 'default.jpg' %>" alt="Current Song Picture" style="max-width: 100%; height: auto;">
+            </div>
+            <div class="playlist-box">
+                <h3>Playlist:</h3>
+                <div class="controls">
+                    <% if (playlist && playlist.length) { %>
+                        <% playlist.forEach(song => { %>
+                            <h4>Now Playing: <%= song.title %> by <%= song.artist %></h4>
+                            <audio controls autoplay>
+                                <source src="/uploads/music/<%= song.music_path %>" type="audio/mpeg">
+                                Your browser does not support the audio tag.
+                            </audio>
+                            
+                        <% }); %>
+                    <% } else { %>
+                        <p>No song selected</p>
+                    <% } %>
+                </div>
+            </div>            
+        </div>
+        
+        <!-- All Songs Section -->
+        <div class="all-data-section">
+            <h2>All Uploaded Songs</h2>
+            <div class="all-data-container">
+                <ul>
+                    <% if (data && data.length) { %>
+                        <% data.forEach(song => { %>
+                            <li>
+                                <a href="/song/<%= song.id %>">
+                                    <h4><%= song.title %> - <%= song.artist %></h4>
+                                    <p><%= song.lyrics %></p>
+                                    <img src="/uploads/pictures/<%= song.pictures %>" alt="<%= song.title %> Cover" style="max-width: 100%; height: auto;">
+                                    <!-- Edit and Remove buttons -->
+                                    <a href="/edit/<%= song.id %>" class="btn btn-edit">Edit</a>
+                                    <form action="/remove/<%= song.id %>" method="POST" style="display:inline;">
+                                        <button type="submit" class="btn btn-remove" onclick="return confirm('Are you sure you want to delete this song?');">Remove</button>
+                                    </form>
+                                </a>
+                            </li>
+                        <% }); %>
+                    <% } else { %>
+                        <li>No songs uploaded yet.</li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>        
+    </div>
+</body>
+</html>
+
+
+
